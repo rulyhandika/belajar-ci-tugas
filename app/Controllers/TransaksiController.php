@@ -82,7 +82,7 @@ class TransaksiController extends BaseController
 
 public function getLocation()
 {
-		//keyword pencarian yang dikirimkan dari halaman checkout
+        //keyword pencarian yang dikirimkan dari halaman checkout
     $search = $this->request->getGet('search');
 
     $response = $this->client->request(
@@ -101,10 +101,10 @@ public function getLocation()
 
 public function getCost()
 { 
-		//ID lokasi yang dikirimkan dari halaman checkout
+        //ID lokasi yang dikirimkan dari halaman checkout
     $destination = $this->request->getGet('destination');
 
-		//parameter daerah asal pengiriman, berat produk, dan kurir dibuat statis
+        //parameter daerah asal pengiriman, berat produk, dan kurir dibuat statis
     //valuenya => 64999 : PEDURUNGAN TENGAH , 1000 gram, dan JNE
     $response = $this->client->request(
         'POST', 
@@ -140,7 +140,7 @@ public function getCost()
 
 public function buy()
 {
-    if ($this->request->getPost()) { 
+    if ($this->request->getPost()) {
         $dataForm = [
             'username' => $this->request->getPost('username'),
             'total_harga' => $this->request->getPost('total_harga'),
@@ -151,7 +151,12 @@ public function buy()
             'updated_at' => date("Y-m-d H:i:s")
         ];
 
-        $this->transaction->insert($dataForm);
+        if ($this->transaction->insert($dataForm) === false) {
+            $errors = $this->transaction->errors();
+            // Tampilkan error ke user atau log
+            session()->setFlashdata('error', 'Gagal menambah transaksi: ' . json_encode($errors));
+            return redirect()->back()->withInput();
+        }
 
         $last_insert_id = $this->transaction->getInsertID();
 
@@ -166,12 +171,28 @@ public function buy()
                 'updated_at' => date("Y-m-d H:i:s")
             ];
 
-            $this->transaction_detail->insert($dataFormDetail);
+            if ($this->transaction_detail->insert($dataFormDetail) === false) {
+                $errors = $this->transaction_detail->errors();
+                session()->setFlashdata('error', 'Gagal menambah detail transaksi: ' . json_encode($errors));
+                return redirect()->back()->withInput();
+            }
         }
 
         $this->cart->destroy();
- 
+        session()->setFlashdata('success', 'Transaksi berhasil ditambahkan!');
         return redirect()->to(base_url());
     }
 }
+    public function updateStatus($id) 
+        { 
+            $status = $this->request->getPost('status'); 
+            
+            if ($this->transaction->updateStatus($id, $status)) { 
+                return redirect()->back()->with('success', 'Status transaksi berhasil 
+    diperbarui.'); 
+            } else { 
+                return redirect()->back()->with('error', 'Gagal memperbarui status 
+    transaksi.'); 
+            } 
+        } 
 }

@@ -35,4 +35,10 @@ $routes->get('get-cost', 'TransaksiController::getCost', ['filter' => 'auth']);
 
 $routes->get('profile', 'Home::profile', ['filter' => 'auth']);
 
+$routes->resource('api', ['controller' => 'apiController']);
+
 $routes->get('/keranjang', 'TransaksiController::index');
+
+$routes->post('penjualan/updateStatus/(:any)', 
+'TransaksiController::updateStatus/$1', ['filter' => 'auth']); 
+$routes->get('penjualan', 'Home::penjualan', ['filter' => 'auth']); 
