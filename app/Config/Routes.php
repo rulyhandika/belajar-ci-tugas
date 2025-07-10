@@ -5,7 +5,7 @@ use CodeIgniter\Router\RouteCollection;
 /**
  * @var RouteCollection $routes
  */
-$routes->get('/', 'Home::index');
+$routes->get('/', 'Home::index', ['filter' => 'auth']);
 
 $routes->get('login', 'AuthController::login');
 $routes->post('login', 'AuthController::login');
@@ -39,6 +39,11 @@ $routes->resource('api', ['controller' => 'apiController']);
 
 $routes->get('/keranjang', 'TransaksiController::index');
 
+$routes->post('profile/upload_bukti/(:num)', 'Home::uploadBukti/$1', ['filter' => 'auth']);
+
 $routes->post('penjualan/updateStatus/(:any)', 
 'TransaksiController::updateStatus/$1', ['filter' => 'auth']); 
-$routes->get('penjualan', 'Home::penjualan', ['filter' => 'auth']); 
+$routes->get('penjualan', 'Home::penjualan', ['filter' => 'auth']);
+$routes->get('laporan', 'LaporanController::index', ['filter' => 'auth']);
+$routes->get('laporan/pdf', 'LaporanController::pdf', ['filter' => 'auth']);
+$routes->get('laporan/excel', 'LaporanController::excel', ['filter' => 'auth']);

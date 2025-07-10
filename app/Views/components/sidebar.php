@@ -25,6 +25,12 @@
                     <span>Produk</span>
                 </a>
             </li><!-- End Produk Nav -->
+            <li class="nav-item">
+                <a class="nav-link <?php echo (uri_string() == 'laporan') ? '' : 'collapsed' ?>" href="laporan">
+                    <i class="bi bi-bar-chart"></i>
+                    <span>Laporan Pendapatan</span>
+                </a>
+            </li><!-- End Laporan Nav -->
         <?php
         }
         ?>
@@ -34,13 +40,14 @@
                 <span>Profile</span>
             </a>
         </li><!-- End Profile Nav -->
-        <li class="nav-item"> 
-            <a class="nav-link <?php echo (uri_string() == 'penjualan') ? "" : 
-        "collapsed" ?>" href="penjualan"> 
-                <i class="bi bi-card-list"></i> 
-                <span>Penjualan</span> 
-            </a> 
-        </li><!-- End Penjualan Nav --> 
+        <?php if (session()->get('role') !== 'guest') : ?>
+        <li class="nav-item">
+            <a class="nav-link <?php echo (uri_string() == 'penjualan') ? '' : 'collapsed' ?>" href="penjualan">
+                <i class="bi bi-card-list"></i>
+                <span>Penjualan</span>
+            </a>
+        </li><!-- End Penjualan Nav -->
+        <?php endif; ?>
     </ul>
         
 </aside><!-- End Sidebar-->

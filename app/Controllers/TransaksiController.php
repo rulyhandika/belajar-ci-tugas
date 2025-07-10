@@ -181,18 +181,18 @@ public function buy()
         $this->cart->destroy();
         session()->setFlashdata('success', 'Transaksi berhasil ditambahkan!');
         return redirect()->to(base_url());
+    }}
+    public function updateStatus($id)
+    {
+        // Cek apakah user adalah admin
+        if (session()->get('role') !== 'admin') {
+            return redirect()->back()->with('error', 'Akses hanya untuk admin!');
+        }
+        $status = $this->request->getPost('status');
+        if ($this->transaction->updateStatus($id, $status)) {
+            return redirect()->back()->with('success', 'Status transaksi berhasil diperbarui.');
+        } else {
+            return redirect()->back()->with('error', 'Gagal memperbarui status transaksi.');
+        }
     }
-}
-    public function updateStatus($id) 
-        { 
-            $status = $this->request->getPost('status'); 
-            
-            if ($this->transaction->updateStatus($id, $status)) { 
-                return redirect()->back()->with('success', 'Status transaksi berhasil 
-    diperbarui.'); 
-            } else { 
-                return redirect()->back()->with('error', 'Gagal memperbarui status 
-    transaksi.'); 
-            } 
-        } 
 }

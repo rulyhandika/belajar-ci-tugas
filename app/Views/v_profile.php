@@ -13,7 +13,8 @@ History Transaksi Pembelian <strong><?= $username ?></strong>
                 <th scope="col">Total Bayar</th>
                 <th scope="col">Alamat</th>
                 <th scope="col">Status</th>
-                <th scope="col"></th>
+                <th scope="col">Bukti Pembayaran</th>
+                <th scope="col">Detail & Upload</th>
             </tr>
         </thead>
         <tbody>
@@ -37,9 +38,46 @@ History Transaksi Pembelian <strong><?= $username ?></strong>
                         ][$item['status']] ?? 'Status Tidak Diketahui' ?> 
                         </td> 
                         <td>
-                            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#detailModal-<?= $item['id'] ?>">
-                                Detail
-                            </button>
+                            <!-- Bukti Pembayaran -->
+                            <?php if (!empty($item['bukti_pembayaran'])): ?>
+                                <img src="<?= base_url('bukti/' . $item['bukti_pembayaran']) ?>" alt="Bukti Pembayaran" style="max-width:100px;max-height:100px;display:block;">
+                            <?php else: ?>
+                                <span class="text-muted">Belum ada bukti</span>
+                            <?php endif; ?>
+                        </td>
+                        <td>
+                            <div class="d-inline-flex gap-1">
+                                <button type="button" class="btn btn-success btn-sm px-2 py-1" style="font-size:0.9rem;" data-bs-toggle="modal" data-bs-target="#detailModal-<?= $item['id'] ?>">
+                                    Detail
+                                </button>
+                                <button type="button" class="btn btn-primary btn-sm px-2 py-1" style="font-size:0.9rem;" data-bs-toggle="modal" data-bs-target="#uploadBuktiModal-<?= $item['id'] ?>">
+                                    Upload Bukti
+                                </button>
+                            </div>
+                            <!-- Modal Upload Bukti per transaksi -->
+                            <div class="modal fade" id="uploadBuktiModal-<?= $item['id'] ?>" tabindex="-1" aria-labelledby="uploadBuktiLabel-<?= $item['id'] ?>" aria-hidden="true">
+                              <div class="modal-dialog">
+                                <div class="modal-content">
+                                  <div class="modal-header">
+                                    <h5 class="modal-title" id="uploadBuktiLabel-<?= $item['id'] ?>">Upload Bukti Pembayaran</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                  </div>
+                                  <form action="<?= base_url('profile/upload_bukti/' . $item['id']) ?>" method="post" enctype="multipart/form-data">
+                                    <?= csrf_field() ?>
+                                    <div class="modal-body">
+                                      <div class="mb-3">
+                                        <label for="bukti_pembayaran_<?= $item['id'] ?>" class="form-label">Bukti Pembayaran (gambar)</label>
+                                        <input type="file" name="bukti_pembayaran" id="bukti_pembayaran_<?= $item['id'] ?>" class="form-control" accept="image/*" required>
+                                      </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                                      <button type="submit" class="btn btn-primary">Kirim</button>
+                                    </div>
+                                  </form>
+                                </div>
+                              </div>
+                            </div>
                         </td>
                     </tr>
                     <!-- Detail Modal Begin -->
@@ -53,19 +91,19 @@ History Transaksi Pembelian <strong><?= $username ?></strong>
                                 <div class="modal-body">
                                     <?php 
                                     if(!empty($product)){
-	                                    foreach ($product[$item['id']] as $index2 => $item2) : ?>
-	                                        <?php echo $index2 + 1 . ")" ?>
-	                                        <?php if ($item2['foto'] != '' and file_exists("img/" . $item2['foto'] . "")) : ?>
-	                                            <img src="<?php echo base_url() . "img/" . $item2['foto'] ?>" width="100px">
-	                                        <?php endif; ?>
-	                                        <strong><?= $item2['nama'] ?></strong>
-	                                        <?= number_to_currency($item2['harga'], 'IDR') ?>
-	                                        <br>
-	                                        <?= "(" . $item2['jumlah'] . " pcs)" ?><br>
-	                                        <?= number_to_currency($item2['subtotal_harga'], 'IDR') ?>
-	                                        <hr>
-	                                    <?php 
-	                                    endforeach; 
+                                        foreach ($product[$item['id']] as $index2 => $item2) : ?>
+                                            <?php echo $index2 + 1 . ")" ?>
+                                            <?php if ($item2['foto'] != '' and file_exists("img/" . $item2['foto'] . "")) : ?>
+                                                <img src="<?php echo base_url() . "img/" . $item2['foto'] ?>" width="100px">
+                                            <?php endif; ?>
+                                            <strong><?= $item2['nama'] ?></strong>
+                                            <?= number_to_currency($item2['harga'], 'IDR') ?>
+                                            <br>
+                                            <?= "(" . $item2['jumlah'] . " pcs)" ?><br>
+                                            <?= number_to_currency($item2['subtotal_harga'], 'IDR') ?>
+                                            <hr>
+                                        <?php 
+                                        endforeach; 
                                     }
                                     ?>
                                     Ongkir <?= number_to_currency($item['ongkir'], 'IDR') ?>

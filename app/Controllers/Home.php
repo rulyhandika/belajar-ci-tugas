@@ -55,7 +55,28 @@ class Home extends BaseController
     }
     public function penjualan()
     {
-        $data['transaction']= $this->transaction->findAll();
+        $data['transactions']= $this->transaction->findAll();
         return view('v_penjualan', $data);
+    }
+    public function uploadBukti($id)
+    {
+        $transaction = $this->transaction->find($id);
+        if (!$transaction || $transaction['username'] !== session()->get('username')) {
+            return redirect()->back()->with('error', 'Transaksi tidak valid!');
+        }
+
+        $file = $this->request->getFile('bukti_pembayaran');
+        if ($file && $file->isValid() && !$file->hasMoved()) {
+            $newName = $id . '_' . time() . '.' . $file->getExtension();
+            $uploadPath = FCPATH . 'bukti/'; // FCPATH = public/
+            if (!is_dir($uploadPath)) {
+                mkdir($uploadPath, 0777, true);
+            }
+            $file->move($uploadPath, $newName);
+            $this->transaction->update($id, ['bukti_pembayaran' => $newName]);
+            return redirect()->back()->with('success', 'Bukti pembayaran berhasil diupload!');
+        } else {
+            return redirect()->back()->with('error', 'Upload gagal! Pastikan file gambar valid.');
+        }
     }
 }
